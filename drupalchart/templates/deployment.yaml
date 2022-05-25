@@ -1,0 +1,75 @@
+#Deployment MYSQL
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: drupal-mysql
+  name: drupal-mysql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: drupal-mysql
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: drupal-mysql
+    spec:
+      volumes: 
+        - name: vol-drupal-mysql
+          persistentVolumeClaim: 
+            claimName: drupal-mysql-pvc
+      containers:
+      - image: mysql/mysql-server:latest
+        name: mysql
+        envFrom:
+        - secretRef:
+            name: drupal-mysql-secret
+        ports: 
+            - containerPort: 3307
+              name: mysql-port
+              protocol: TCP
+        volumeMounts: 
+            - mountPath: /var/lib/mysql
+              name: vol-drupal-mysql
+        resources: {}
+status: {}
+
+#Deployment Drupal
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: drupal-app
+  name: drupal-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: drupal-app
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: drupal-app
+    spec:
+      # volumes: 
+      #   - name: vol-drupal
+      #     persistentVolumeClaim: 
+      #       claimName: drupal-pvc
+      imagePullSecrets:
+      - name: mydockercreds
+      containers:
+      - image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        name: drupal
+        ports: 
+            - containerPort: 80
+              name: drupal-port
+              protocol: TCP
+        # volumeMounts: 
+        #     - mountPath: /var/www/html
+        #       name: vol-drupal
+        resources: {}
+status: {}

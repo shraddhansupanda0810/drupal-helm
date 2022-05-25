@@ -1,0 +1,27 @@
+#PersistentVolumeClaim MYSQL
+--- 
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata: 
+  name: drupal-mysql-pvc
+spec: 
+  storageClassName: manual
+  accessModes: 
+    - ReadWriteMany
+  resources: 
+    requests: 
+      storage: 2Gi
+      
+#PersistentVolumeClaim Drupal
+--- 
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata: 
+  name: drupal-pvc
+spec: 
+  storageClassName: manual
+  accessModes: 
+    - ReadWriteMany
+  resources: 
+    requests: 
+      storage: 2Gi
